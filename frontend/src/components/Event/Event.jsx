@@ -3,28 +3,44 @@ import { format, parseISO } from "date-fns";
 import { VerticalDot } from "../../assets/verticalDot";
 import { Fragment } from "react";
 import { classNames } from "../../utils/classNames";
+import { deleteEvent } from "../../requests/event.requests";
 
-export const Meeting = ({ meeting }) => {
-  let startDateTime = parseISO(meeting.startDatetime);
-  let endDateTime = parseISO(meeting.endDatetime);
+export const Event = ({ event, setEvents }) => {
+  let startDateTime = parseISO(event.startedAt);
+  let endDateTime = parseISO(event.finishedAt);
 
+  const handleDeleteEvent = async (id) => {
+    try {
+      await deleteEvent(id);
+      setEvents(prevEvents => prevEvents.filter(event => event.id !== id));
+    } catch (error) {
+      console.error('Error deleting event:', error);
+    }
+  }
   return (
     <li className="flex items-center px-4 py-2 space-x-4 group rounded-xl focus-within:bg-gray-100 hover:bg-gray-100">
       <img
-        src={meeting.imageUrl}
+        src={'./image/avatar.svg'}
         alt=""
         className="flex-none w-10 h-10 rounded-full"
       />
       <div className="flex-auto">
-        <p className="text-gray-900">{meeting.name}</p>
+        <p className="text-gray-900">{event.name}</p>
         <p className="mt-0.5">
-          <time dateTime={meeting.startDatetime}>
+          <time dateTime={event.startedAt}>
             {format(startDateTime, "h:mm a")}
           </time>{" "}
           -{" "}
-          <time dateTime={meeting.endDatetime}>
-            {format(endDateTime, "h:mm a")}
-          </time>
+          {event.finishedAt.length > 0
+            ? (
+              <time dateTime={event.finishedAt}>
+                {format(endDateTime, "h:mm a")}
+              </time>
+            )
+            : (
+              'Not selected'
+            )
+          }
         </p>
       </div>
       <Menu
@@ -55,20 +71,9 @@ export const Meeting = ({ meeting }) => {
                       active ? "bg-gray-100 text-gray-900" : "text-gray-700",
                       "block px-4 py-2 text-sm cursor-pointer"
                     )}
+                    onClick={() => handleDeleteEvent(event.id)}
                   >
-                    Edit
-                  </div>
-                )}
-              </Menu.Item>
-              <Menu.Item>
-                {({ active }) => (
-                  <div
-                    className={classNames(
-                      active ? "bg-gray-100 text-gray-900" : "text-gray-700",
-                      "block px-4 py-2 text-sm cursor-pointer"
-                    )}
-                  >
-                    Cancel
+                    Delete
                   </div>
                 )}
               </Menu.Item>

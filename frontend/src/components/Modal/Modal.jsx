@@ -1,16 +1,15 @@
-import { Fragment, useRef } from "react";
+import { Fragment } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { CheckIcon } from "@heroicons/react/24/outline";
+import { NewEventForm } from "../NewEventForm/NewEventForm";
 
-export function Modal({ isOpenModal, setIsOpenModal }) {
-  const cancelButtonRef = useRef(null);
+export function Modal({ isOpenModal, setIsOpenModal, setEvents }) {
 
   return (
     <Transition.Root show={isOpenModal} as={Fragment}>
       <Dialog
         as="div"
         className="relative z-10"
-        initialFocus={cancelButtonRef}
         onClose={setIsOpenModal}
       >
         <Transition.Child
@@ -52,44 +51,9 @@ export function Modal({ isOpenModal, setIsOpenModal }) {
                       >
                         Add event
                       </Dialog.Title>
-                      <div className="mt-2">
-                        <div>
-                          <label
-                            htmlFor="price"
-                            className="block text-sm font-medium leading-6 text-gray-900"
-                          >
-                            Name
-                          </label>
-                          <div className="relative mt-2 rounded-md shadow-sm">
-                            <input
-                              type="text"
-                              name="name"
-                              id="name"
-                              className="block w-full rounded-md border-0 py-1.5 p-2 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-1 focus:ring-inset focus:ring-green-200 sm:text-sm sm:leading-6"
-                              placeholder="Enter name"
-                            />
-                          </div>
-                        </div>
-                      </div>
+                      <NewEventForm setEvents={setEvents} setIsOpenModal={setIsOpenModal} />
                     </div>
                   </div>
-                </div>
-                <div className="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
-                  <button
-                    type="button"
-                    className="inline-flex w-full justify-center rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-500 sm:ml-3 sm:w-auto"
-                    onClick={() => setIsOpenModal(false)}
-                  >
-                    Complete
-                  </button>
-                  <button
-                    type="button"
-                    className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-100 sm:mt-0 sm:w-auto"
-                    onClick={() => setIsOpenModal(false)}
-                    ref={cancelButtonRef}
-                  >
-                    Cancel
-                  </button>
                 </div>
               </Dialog.Panel>
             </Transition.Child>

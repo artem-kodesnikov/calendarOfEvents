@@ -5,7 +5,7 @@ const eventsRoutes = require('./routers/events.route.js');
 const { Sequelize } = require('sequelize');
 
 const app = express();
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 5000;
 
 app.use(express.json());
 app.use(cors());

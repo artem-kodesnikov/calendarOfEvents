@@ -12,54 +12,16 @@ import {
   parseISO,
   startOfToday
 } from "date-fns";
-import { useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { LeftArrow, RightArrow } from "./assets/arrows";
 import { Modal } from "./components/Modal/Modal";
-import { Meeting } from "./components/Event/Event";
+import { Event } from "./components/Event/Event";
 import { classNames } from "./utils/classNames";
+import { getEvents } from "./requests/event.requests";
+import { colStartClasses } from "./values/colomnsStart";
 
-const meetings = [
-  {
-    id: 1,
-    name: "Leslie Alexander",
-    imageUrl:
-      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    startDatetime: "2023-07-11T13:00",
-    endDatetime: "2023-07-11T14:30"
-  },
-  {
-    id: 2,
-    name: "Michael Foster",
-    imageUrl:
-      "https://images.unsplash.com/photo-1519244703995-f4e0f30006d5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    startDatetime: "2023-07-20T09:00",
-    endDatetime: "2023-07-20T11:30"
-  },
-  {
-    id: 3,
-    name: "Dries Vincent",
-    imageUrl:
-      "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    startDatetime: "2023-07-20T17:00",
-    endDatetime: "2023-07-20T18:30"
-  },
-  {
-    id: 4,
-    name: "Leslie Alexander",
-    imageUrl:
-      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    startDatetime: "2023-06-09T13:00",
-    endDatetime: "2023-06-09T14:30"
-  },
-  {
-    id: 5,
-    name: "Michael Foster",
-    imageUrl:
-      "https://images.unsplash.com/photo-1519244703995-f4e0f30006d5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    startDatetime: "2023-07-13T14:00",
-    endDatetime: "2023-07-13T14:30"
-  }
-];
+const DateContext = createContext();
+export const useDateContext = () => useContext(DateContext);
 
 export default function Example() {
   const today = startOfToday();
@@ -67,6 +29,26 @@ export default function Example() {
   const [currentMonth, setCurrentMonth] = useState(format(today, "MMM-yyyy"));
   const [isOpenModal, setIsOpenModal] = useState(false);
   const firstDayCurrentMonth = parse(currentMonth, "MMM-yyyy", new Date());
+  const [events, setEvents] = useState([]);
+
+  const fetchData = async () => {
+    try {
+      const { data } = await getEvents();
+      setEvents(data);
+    } catch (error) {
+      console.error('Error fetching heroes:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    if (!isOpenModal) {
+      fetchData();
+    }
+  }, [isOpenModal]);
 
   const days = eachDayOfInterval({
     start: firstDayCurrentMonth,
@@ -83,8 +65,8 @@ export default function Example() {
     setCurrentMonth(format(firstDayNextMonth, "MMM-yyyy"));
   }
 
-  const selectedDayMeetings = meetings.filter((meeting) =>
-    isSameDay(parseISO(meeting.startDatetime), selectedDay)
+  const selectedDayEvents = events.filter((event) =>
+    isSameDay(parseISO(event.startedAt), selectedDay)
   );
 
   return (
@@ -137,23 +119,23 @@ export default function Example() {
                     className={classNames(
                       isEqual(day, selectedDay) && "text-white",
                       !isEqual(day, selectedDay) &&
-                        isToday(day) &&
-                        "text-red-500",
+                      isToday(day) &&
+                      "text-red-500",
                       !isEqual(day, selectedDay) &&
-                        !isToday(day) &&
-                        isSameMonth(day, firstDayCurrentMonth) &&
-                        "text-gray-900",
+                      !isToday(day) &&
+                      isSameMonth(day, firstDayCurrentMonth) &&
+                      "text-gray-900",
                       !isEqual(day, selectedDay) &&
-                        !isToday(day) &&
-                        !isSameMonth(day, firstDayCurrentMonth) &&
-                        "text-gray-400",
+                      !isToday(day) &&
+                      !isSameMonth(day, firstDayCurrentMonth) &&
+                      "text-gray-400",
                       isEqual(day, selectedDay) && isToday(day) && "bg-red-500",
                       isEqual(day, selectedDay) &&
-                        !isToday(day) &&
-                        "bg-gray-900",
+                      !isToday(day) &&
+                      "bg-gray-900",
                       !isEqual(day, selectedDay) && "hover:bg-gray-200",
                       (isEqual(day, selectedDay) || isToday(day)) &&
-                        "font-semibold",
+                      "font-semibold",
                       "mx-auto flex h-8 w-8 items-center justify-center rounded-full"
                     )}
                   >
@@ -163,11 +145,11 @@ export default function Example() {
                   </button>
 
                   <div className="w-1 h-1 mx-auto mt-1">
-                    {meetings.some((meeting) =>
-                      isSameDay(parseISO(meeting.startDatetime), day)
+                    {events.some((event) =>
+                      isSameDay(parseISO(event.startedAt), day)
                     ) && (
-                      <div className="w-1 h-1 rounded-full bg-sky-500"></div>
-                    )}
+                        <div className="w-1 h-1 rounded-full bg-sky-500"></div>
+                      )}
                   </div>
                 </div>
               ))}
@@ -189,9 +171,9 @@ export default function Example() {
               </button>
             </h2>
             <ol className="mt-4 space-y-1 text-sm leading-6 text-gray-500">
-              {selectedDayMeetings.length > 0 ? (
-                selectedDayMeetings.map((meeting) => (
-                  <Meeting meeting={meeting} key={meeting.id} />
+              {selectedDayEvents.length > 0 ? (
+                selectedDayEvents.map((event) => (
+                  <Event setEvents={setEvents} event={event} key={event.id} />
                 ))
               ) : (
                 <p>No meetings for today.</p>
@@ -200,17 +182,13 @@ export default function Example() {
           </section>
         </div>
       </div>
-      <Modal isOpenModal={isOpenModal} setIsOpenModal={setIsOpenModal} />
+      <DateContext.Provider value={{ selectedDay }}>
+        <Modal
+          setEvents={setEvents}
+          isOpenModal={isOpenModal}
+          setIsOpenModal={setIsOpenModal}
+        />
+      </DateContext.Provider>
     </div>
   );
 }
-
-let colStartClasses = [
-  "",
-  "col-start-2",
-  "col-start-3",
-  "col-start-4",
-  "col-start-5",
-  "col-start-6",
-  "col-start-7"
-];
