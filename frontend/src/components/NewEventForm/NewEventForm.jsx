@@ -1,10 +1,12 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { validationSchema } from '../../validation/event';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import { TimePicker } from '../TimePicker/TimePicker';
 import { createNewEvent } from '../../requests/event.requests';
+import { Loader } from '../Loader/Loader';
 
 export const NewEventForm = ({ setIsOpenModal, setEvents }) => {
+  const [isLoading, setIsLoading] = useState(false);
   const cancelButtonRef = useRef(null);
   const initialValues = {
     name: '',
@@ -14,10 +16,14 @@ export const NewEventForm = ({ setIsOpenModal, setEvents }) => {
 
   const onSubmit = async (values) => {
     try {
+      setIsLoading(true);
       await createNewEvent(values);
       setEvents(prevEvents => [...prevEvents, values]);
+      setIsOpenModal(false);
     } catch (error) {
       console.error('Error creating new event:', error);
+    } finally {
+      setIsLoading(false)
     }
   };
 
@@ -45,12 +51,12 @@ export const NewEventForm = ({ setIsOpenModal, setEvents }) => {
           <TimePicker name='finishedAt' label={'Finished at'} />
           <ErrorMessage name="finishedAt" component="div" className="text-red-500" />
         </div>
-        <div className="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+        <div className="px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
           <button
             type="submit"
-            className="inline-flex w-full justify-center rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-500 sm:ml-3 sm:w-auto"
+            className="inline-flex w-full justify-center rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-500 sm:ml-3 sm:w-32"
           >
-            Complete
+            {isLoading ? <Loader /> : 'Complete'}
           </button>
           <button
             type="button"
