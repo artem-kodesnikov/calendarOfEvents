@@ -36,7 +36,7 @@ export default function Example() {
       const { data } = await getEvents();
       setEvents(data);
     } catch (error) {
-      console.error('Error fetching heroes:', error);
+      console.error('Error fetching events:', error);
     }
   };
 

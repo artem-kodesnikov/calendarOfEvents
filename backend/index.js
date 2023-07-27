@@ -10,12 +10,9 @@ const PORT = process.env.PORT || 5000;
 app.use(express.json());
 app.use(cors());
 
-const sequelize = new Sequelize('database_development', 'postgres', 'password', {
-  host: 'localhost',
-  dialect: 'postgres'
-});
-
+const sequelize = new Sequelize(process.env.DB_URL)
 app.use('/events', eventsRoutes);
+
 
 const start = async () => {
   try {

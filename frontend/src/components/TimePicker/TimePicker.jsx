@@ -7,7 +7,6 @@ export const TimePicker = ({ name, label, required }) => {
   const [isoTime, setIsoTime] = useState('');
   const [time, setTime] = useState('');
   const { selectedDay } = useDateContext();
-  console.log(selectedDay);
 
   const handleTimeChange = (event) => {
     setTime(event.target.value);
