@@ -4,7 +4,7 @@ import { VerticalDot } from "../../assets/verticalDot";
 import { Fragment, useState } from "react";
 import { classNames } from "../../utils/classNames";
 import { deleteEvent } from "../../requests/event.requests";
-import { Loader } from "../Loader/Loader";
+import { Loader } from "../Loaders/Loader";
 
 export const Event = ({ event, setEvents }) => {
   let startDateTime = parseISO(event.startedAt);

@@ -19,6 +19,7 @@ import { Event } from "./components/Event/Event";
 import { classNames } from "./utils/classNames";
 import { getEvents } from "./requests/event.requests";
 import { colStartClasses } from "./values/colomnsStart";
+import { EventsLoader } from "./components/Loaders/EventsLoader";
 
 const DateContext = createContext();
 export const useDateContext = () => useContext(DateContext);
@@ -30,6 +31,7 @@ export default function Example() {
   const [isOpenModal, setIsOpenModal] = useState(false);
   const firstDayCurrentMonth = parse(currentMonth, "MMM-yyyy", new Date());
   const [events, setEvents] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const fetchData = async () => {
     try {
@@ -37,18 +39,24 @@ export default function Example() {
       setEvents(data);
     } catch (error) {
       console.error('Error fetching events:', error);
+    } finally {
     }
   };
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    const fetchDataAsync = async () => {
+      try {
+        setIsLoading(true)
+        await fetchData();
+      } catch (error) {
+        console.error('Error fetching events:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-  useEffect(() => {
-    if (!isOpenModal) {
-      fetchData();
-    }
-  }, [isOpenModal]);
+    fetchDataAsync();
+  }, []);
 
   const days = eachDayOfInterval({
     start: firstDayCurrentMonth,
@@ -71,6 +79,7 @@ export default function Example() {
 
   return (
     <div className="pt-16">
+      {isLoading && <EventsLoader />}
       <div className="max-w-md px-4 mx-auto sm:px-7 md:max-w-4xl md:px-6">
         <div className="md:grid md:grid-cols-2 md:divide-x md:divide-gray-200">
           <div className="md:pr-14">
@@ -187,6 +196,7 @@ export default function Example() {
           setEvents={setEvents}
           isOpenModal={isOpenModal}
           setIsOpenModal={setIsOpenModal}
+          fetchData={fetchData}
         />
       </DateContext.Provider>
     </div>

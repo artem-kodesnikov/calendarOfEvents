@@ -3,7 +3,7 @@ import { Dialog, Transition } from "@headlessui/react";
 import { CheckIcon } from "@heroicons/react/24/outline";
 import { NewEventForm } from "../NewEventForm/NewEventForm";
 
-export function Modal({ isOpenModal, setIsOpenModal, setEvents }) {
+export function Modal({ isOpenModal, setIsOpenModal, setEvents, fetchData }) {
 
   return (
     <Transition.Root show={isOpenModal} as={Fragment}>
@@ -51,7 +51,7 @@ export function Modal({ isOpenModal, setIsOpenModal, setEvents }) {
                       >
                         Add event
                       </Dialog.Title>
-                      <NewEventForm setEvents={setEvents} setIsOpenModal={setIsOpenModal} />
+                      <NewEventForm fetchData={fetchData} setEvents={setEvents} setIsOpenModal={setIsOpenModal} />
                     </div>
                   </div>
                 </div>

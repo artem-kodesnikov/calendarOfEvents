@@ -3,9 +3,9 @@ import { validationSchema } from '../../validation/event';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import { TimePicker } from '../TimePicker/TimePicker';
 import { createNewEvent } from '../../requests/event.requests';
-import { Loader } from '../Loader/Loader';
+import { Loader } from '../Loaders/Loader';
 
-export const NewEventForm = ({ setIsOpenModal, setEvents }) => {
+export const NewEventForm = ({ setIsOpenModal, setEvents, fetchData }) => {
   const [isLoading, setIsLoading] = useState(false);
   const cancelButtonRef = useRef(null);
   const initialValues = {
@@ -23,6 +23,7 @@ export const NewEventForm = ({ setIsOpenModal, setEvents }) => {
     } catch (error) {
       console.error('Error creating new event:', error);
     } finally {
+      await fetchData();
       setIsLoading(false)
     }
   };
